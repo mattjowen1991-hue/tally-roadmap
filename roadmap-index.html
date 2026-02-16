@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tally — v3 Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-secondary: #121630;
+      --bg-card: rgba(25, 31, 61, 0.6);
+      --accent-primary: #00d4ff;
+      --accent-secondary: #7c3aed;
+      --accent-tertiary: #f59e0b;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border: rgba(255, 255, 255, 0.08);
+      --glass: rgba(255, 255, 255, 0.03);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 40% 90%, rgba(245, 158, 11, 0.08) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    .header-label {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent-primary);
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .header h1 em {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .header-date {
+      display: inline-block;
+      margin-top: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--glass);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    /* ── Progress Bar ── */
+    .progress-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 14, 39, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      margin: 0 -24px 32px;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .progress-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .progress-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--accent-primary);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--success));
+      border-radius: 4px;
+      transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ── Phase Cards ── */
+    .phase {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      transition: all 0.3s;
+    }
+
+    .phase:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .phase-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .phase-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .phase-desc {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .phase-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .tag-refactor { background: rgba(124, 58, 237, 0.12); color: #a78bfa; border: 1px solid rgba(124, 58, 237, 0.3); }
+    .tag-ui { background: rgba(0, 212, 255, 0.1); color: var(--accent-primary); border: 1px solid rgba(0, 212, 255, 0.25); }
+    .tag-feature { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .tag-logic { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag-polish { background: rgba(236, 72, 153, 0.1); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+
+    /* ── Tasks ── */
+    .task-group {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 20px 0 10px;
+      padding-left: 4px;
+    }
+
+    .task-group:first-child { margin-top: 0; }
+
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      transition: opacity 0.3s;
+    }
+
+    .task:last-child { border-bottom: none; }
+    .task.completed { opacity: 0.5; }
+    .task.completed .task-name { text-decoration: line-through; }
+
+    .task-check {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 1px;
+    }
+
+    .task-check:hover {
+      border-color: var(--accent-primary);
+      background: rgba(0, 212, 255, 0.05);
+    }
+
+    .task-check.done {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .task-check svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--bg-primary);
+      stroke-width: 3;
+      fill: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .task-check.done svg { opacity: 1; }
+
+    .task-content { flex: 1; }
+
+    .task-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+      transition: all 0.2s;
+    }
+
+    .task-detail {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Completed Section ── */
+    .completed-section {
+      margin-top: 40px;
+    }
+
+    .completed-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .completed-toggle:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .completed-toggle-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .completed-toggle-left svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--success);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .completed-toggle-left span {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .completed-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+
+    .completed-chevron {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 2;
+      transition: transform 0.3s;
+    }
+
+    .completed-toggle.open .completed-chevron {
+      transform: rotate(180deg);
+    }
+
+    .completed-list {
+      display: none;
+      padding: 16px 0 0;
+    }
+
+    .completed-list.show { display: block; }
+
+    .completed-phase {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+
+    .completed-phase-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .completed-phase-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .phase {
+      animation: fadeInUp 0.6s ease backwards;
+    }
+    .phase:nth-child(1) { animation-delay: 0.1s; }
+    .phase:nth-child(2) { animation-delay: 0.2s; }
+    .phase:nth-child(3) { animation-delay: 0.3s; }
+    .phase:nth-child(4) { animation-delay: 0.4s; }
+    .phase:nth-child(5) { animation-delay: 0.5s; }
+
+    @media (max-width: 600px) {
+      .container { padding: 24px 16px 60px; }
+      .header h1 { font-size: 32px; }
+      .phase { padding: 20px; }
+      .phase-title { font-size: 22px; }
+      .progress-sticky { margin: 0 -16px 24px; padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-label">Project Roadmap</div>
+      <h1>Tally <em>v3</em></h1>
+      <p>Vite + React migration complete. All 5 panels working. Time to refine, split, and expand.</p>
+      <div class="header-date">Last updated: 16 Feb 2026</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-sticky">
+      <div class="progress-top">
+        <span class="progress-text" id="progress-text">0 / 0 tasks</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- PHASE 1 — Component Split                   -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="phase">
+      <div class="phase-label">Phase 1 — Architecture</div>
+      <div class="phase-title">Component Split</div>
+      <div class="phase-desc">App.jsx is 1270 lines. Break it into focused, maintainable components. No feature changes — just structure.</div>
+      <div class="phase-tags">
+        <span class="tag tag-refactor">Refactor</span>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Extract panel components</div>
+          <div class="task-detail">OverviewPanel.jsx, ActionsPanel.jsx, BillsPanel.jsx, DebtPanel.jsx, SavingsPanel.jsx</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Extract modal components</div>
+          <div class="task-detail">AddBillModal.jsx, AddDebtModal.jsx, AddSavingsModal.jsx, ManageCategoriesModal.jsx</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Extract shared components</div>
+          <div class="task-detail">BillCard.jsx, DebtCard.jsx, SavingsCard.jsx, ProgressBar.jsx, StatCard.jsx</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Extract hooks</div>
+          <div class="task-detail">useSwipe.js (touch handling), useStorage.js (load/save), useMonthRollover.js (reset logic)</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Verify everything still works</div>
+          <div class="task-detail">Run test cases v4.1. Zero regressions. Deploy to device.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- PHASE 2 — UX Polish                         -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="phase">
+      <div class="phase-label">Phase 2 — UX Polish</div>
+      <div class="phase-title">Micro-interactions & Feel</div>
+      <div class="phase-desc">Small touches that make the app feel premium. Animations, haptics, transitions, and visual refinements.</div>
+      <div class="phase-tags">
+        <span class="tag tag-ui">UI</span>
+        <span class="tag tag-polish">Polish</span>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Panel transition animations</div>
+          <div class="task-detail">Smooth slide transitions between panels with spring easing, rather than instant swaps</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Card entry animations</div>
+          <div class="task-detail">Staggered fade-in when switching panels. Bills, debts, savings cards animate in sequentially.</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Haptic feedback (Capacitor)</div>
+          <div class="task-detail">Light vibration on button taps, toggle paid, swipe panel change. Uses Capacitor Haptics plugin.</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Toast notifications</div>
+          <div class="task-detail">"Bill added", "Payment recorded", "Goal reached!" — subtle slide-up toasts instead of silent changes</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Swipe-to-delete on bill cards</div>
+          <div class="task-detail">Swipe left to reveal delete button on individual bills, debts, savings — like iOS Mail</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Pull-to-refresh feel</div>
+          <div class="task-detail">Pull down on any panel to trigger a visual refresh with the Tally logo as the spinner</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- PHASE 3 — New Features                      -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="phase">
+      <div class="phase-label">Phase 3 — Features</div>
+      <div class="phase-title">Monthly Reports & Insights</div>
+      <div class="phase-desc">Give users real insight into their spending habits. End-of-month summaries, trends over time, and smart nudges.</div>
+      <div class="phase-tags">
+        <span class="tag tag-feature">Feature</span>
+        <span class="tag tag-logic">Logic</span>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Monthly snapshot storage</div>
+          <div class="task-detail">On month rollover, save a snapshot: total income, expenses per category, bills paid/missed, debt reduced, savings deposited</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Monthly summary view</div>
+          <div class="task-detail">New panel or modal: "February Summary" — income vs expenses, biggest categories, missed bills, debt progress</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Spending trends chart</div>
+          <div class="task-detail">Line chart showing monthly expenses over time. Uses stored snapshots. Chart.js line/bar integration.</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Bill search</div>
+          <div class="task-detail">Search/filter input on the Bills panel to find specific bills by name across all categories</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Sort bills</div>
+          <div class="task-detail">Sort by: due date, amount (high/low), name, status. Dropdown on the Bills panel.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- PHASE 4 — Desktop & Multi-Platform          -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="phase">
+      <div class="phase-label">Phase 4 — Multi-Platform</div>
+      <div class="phase-title">Desktop Layout & iOS</div>
+      <div class="phase-desc">Expand beyond mobile. A proper desktop layout with sidebar navigation, and an iOS build for the App Store.</div>
+      <div class="phase-tags">
+        <span class="tag tag-ui">UI</span>
+        <span class="tag tag-feature">Feature</span>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Desktop sidebar navigation</div>
+          <div class="task-detail">Replace swipe panels with a fixed sidebar on screens > 768px. Icons + labels. Content area to the right.</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Desktop bill table view</div>
+          <div class="task-detail">Sortable table layout for bills on desktop — name, category, projected, actual, status, due date. Inline editing.</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Responsive breakpoints</div>
+          <div class="task-detail">Clean transition between mobile card layout and desktop table layout. Intermediate tablet layout.</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">iOS build setup</div>
+          <div class="task-detail">Capacitor iOS config, Xcode project, safe area insets, status bar styling. Test on simulator.</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">App icons & store assets</div>
+          <div class="task-detail">Generate app icons from Tally logo. Android adaptive icons. iOS icon set. Store screenshots.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- PHASE 5 — Data & Export                     -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="phase">
+      <div class="phase-label">Phase 5 — Data</div>
+      <div class="phase-title">Export, Backup & Settings</div>
+      <div class="phase-desc">Users need control over their data. Export to CSV, backup/restore, and a proper settings screen.</div>
+      <div class="phase-tags">
+        <span class="tag tag-feature">Feature</span>
+        <span class="tag tag-logic">Logic</span>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Export bills to CSV</div>
+          <div class="task-detail">Generate and download a CSV of all bills, debts, savings with dates and amounts</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Backup & restore</div>
+          <div class="task-detail">Export all data as JSON file. Import from JSON to restore. Useful for switching devices.</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Settings panel</div>
+          <div class="task-detail">Currency symbol, theme (auto/dark/light), reset all data, about screen, version info</div>
+        </div>
+      </div>
+
+      <div class="task" data-task>
+        <div class="task-check" onclick="toggleTask(this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="task-content">
+          <div class="task-name">Notification reminders</div>
+          <div class="task-detail">Capacitor Local Notifications — remind user of upcoming bills, unpaid items, savings goals</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- COMPLETED IN v2                             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="completed-section">
+      <div class="completed-toggle" id="completed-toggle" onclick="toggleCompleted()">
+        <div class="completed-toggle-left">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Completed in v2</span>
+          <span class="completed-badge">40+ features</span>
+        </div>
+        <svg class="completed-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+
+      <div class="completed-list" id="completed-list">
+        <div class="completed-phase">
+          <div class="completed-phase-title">Vite + React Migration</div>
+          <div class="completed-phase-desc">Migrated from 3500-line monolith to Vite + React with proper build pipeline, component-ready architecture, and Capacitor integration.</div>
+        </div>
+        <div class="completed-phase">
+          <div class="completed-phase-title">Brand & Splash</div>
+          <div class="completed-phase-desc">Animated SVG splash with SMIL, Tally wordmark, gradient logo, glass-morphism dark theme, custom icon set.</div>
+        </div>
+        <div class="completed-phase">
+          <div class="completed-phase-title">5-Panel Swipe Navigation</div>
+          <div class="completed-phase-desc">Overview, Actions, Bills, Debt, Savings panels with touch gestures, sticky nav dots, edge resistance, independent scroll.</div>
+        </div>
+        <div class="completed-phase">
+          <div class="completed-phase-title">Bills Management</div>
+          <div class="completed-phase-desc">Full CRUD, category/status filters, paid/missed/paused toggles, inline editing, auto-pay logic for all frequencies, month rollover.</div>
+        </div>
+        <div class="completed-phase">
+          <div class="completed-phase-title">Debt Tracking</div>
+          <div class="completed-phase-desc">Add/edit/delete debts, manual payments, auto-reduce on month rollover, payoff calculator, collapsible payment history.</div>
+        </div>
+        <div class="completed-phase">
+          <div class="completed-phase-title">Savings Goals</div>
+          <div class="completed-phase-desc">Goals with targets, deposit/withdraw, auto-save on month rollover, progress bars, time estimates, collapsible transaction history.</div>
+        </div>
+        <div class="completed-phase">
+          <div class="completed-phase-title">Quick Actions Panel</div>
+          <div class="completed-phase-desc">Income input, Add Bill / Add Debt / Add Savings shortcuts, Manage Categories, category summary.</div>
+        </div>
+        <div class="completed-phase">
+          <div class="completed-phase-title">Bug Fixes & Polish</div>
+          <div class="completed-phase-desc">Sticky 0 input fix, filter pill consistency, withdraw bug fix, splash timing refinement, sticky nav bar.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Tally — Built with care, one feature at a time</p>
+    </div>
+  </div>
+
+  <script>
+    function toggleTask(el) {
+      el.classList.toggle('done');
+      el.closest('.task').classList.toggle('completed');
+      updateProgress();
+      saveState();
+    }
+
+    function toggleCompleted() {
+      const toggle = document.getElementById('completed-toggle');
+      const list = document.getElementById('completed-list');
+      toggle.classList.toggle('open');
+      list.classList.toggle('show');
+    }
+
+    function updateProgress() {
+      const tasks = document.querySelectorAll('[data-task]');
+      const done = document.querySelectorAll('[data-task] .task-check.done').length;
+      const total = tasks.length;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      document.getElementById('progress-text').textContent = `${done} / ${total} tasks`;
+      document.getElementById('progress-pct').textContent = pct + '%';
+      document.getElementById('progress-fill').style.width = pct + '%';
+    }
+
+    function saveState() {
+      const tasks = document.querySelectorAll('[data-task]');
+      const state = Array.from(tasks).map(t => t.querySelector('.task-check').classList.contains('done'));
+      localStorage.setItem('tally-roadmap-v3', JSON.stringify(state));
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('tally-roadmap-v3');
+      if (saved) {
+        const state = JSON.parse(saved);
+        const tasks = document.querySelectorAll('[data-task]');
+        tasks.forEach((t, i) => {
+          if (state[i]) {
+            t.querySelector('.task-check').classList.add('done');
+            t.classList.add('completed');
+          }
+        });
+      }
+      updateProgress();
+    }
+
+    loadState();
+  </script>
+</body>
+</html>
